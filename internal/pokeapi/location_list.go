@@ -4,12 +4,23 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+
+	
 )
 
 func (c *Client) ListLocations(pageURL *string) (RespShallowLocations, error) {
 	url := baseURL + "/location-area"
 	if pageURL != nil {
 		url = *pageURL
+	}
+
+	if entry, ok := c.cache.Get(url); ok {
+		locationsResp := RespShallowLocations{}
+		err := json.Unmarshal(entry, &locationsResp)
+		if err != nil {
+			return RespShallowLocations{}, err
+		}
+		return locationsResp, nil
 	}
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -28,11 +39,13 @@ func (c *Client) ListLocations(pageURL *string) (RespShallowLocations, error) {
 		return RespShallowLocations{}, err
 	}
 
+	
 	locationsResp := RespShallowLocations{}
 	err = json.Unmarshal(dat, &locationsResp)
 	if err != nil {
 		return RespShallowLocations{}, err
 	}
-
+	
+	c.cache.Add(url, dat)
 	return locationsResp, nil
 }
