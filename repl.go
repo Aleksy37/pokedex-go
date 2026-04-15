@@ -10,7 +10,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, string) error
 }
 
 type config struct {
@@ -31,9 +31,13 @@ func startRepl(cfg *config) {
 		}
 		
 		commandName := cleanedInput[0]
+		commandArgs := ""
+		if len(cleanedInput) >= 2 {
+			commandArgs = cleanedInput[1]
+		}
 		
 		if command, exists := getCommands()[commandName]; exists {
-			err := command.callback(cfg)
+			err := command.callback(cfg, commandArgs)
 			if err != nil {
 				fmt.Printf("Error executing command '%s': %v\n", commandName, err)
 			}
@@ -72,6 +76,11 @@ func getCommands() map[string]cliCommand {
 			name:        "exit",
 			description: "Exit the Pokedex",
 			callback:    commandExit,
+		},
+		"explore": {
+			name: 		 "explore",
+			description: "explore an area and return a list of encounters",
+			callback: 	 commandExplore,
 		},
 	}
 }
