@@ -10,7 +10,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config, string) error
+	callback    func(*config, ...string) error
 }
 
 type config struct {
@@ -31,13 +31,13 @@ func startRepl(cfg *config) {
 		}
 		
 		commandName := cleanedInput[0]
-		commandArgs := ""
-		if len(cleanedInput) >= 2 {
-			commandArgs = cleanedInput[1]
+		commandArgs := []string{}
+		if len(cleanedInput) > 1 {
+			commandArgs = cleanedInput[1:]
 		}
 		
 		if command, exists := getCommands()[commandName]; exists {
-			err := command.callback(cfg, commandArgs)
+			err := command.callback(cfg, commandArgs...)
 			if err != nil {
 				fmt.Printf("Error executing command '%s': %v\n", commandName, err)
 			}
