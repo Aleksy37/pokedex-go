@@ -14,7 +14,7 @@ func commandCatch(cfg *config, args ...string) error {
 	pokemonName := args[0]
 	pokemonData, err := cfg.pokeapiClient.GetPokemonData(pokemonName)
 	if err != nil {
-		return err
+		return errors.New("Error fetching API data")
 	}
 	
 	fmt.Printf("Throwing a Pokeball at %s...\n", pokemonData.Name)
